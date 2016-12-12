@@ -79,6 +79,52 @@ Paths Slice::resampleContour(int N)
 	return ppg;
 }
 
+// returns the unit normal (diagonal) at one vertex
+Vector2<double> Slice::getNormalAt(int vertexId, int loopId)
+{
+	Vector2<double> vec1, vec2, normal;
+	Path pg = contour[loopId];
+	int sz = (int)pg.size();
+	vec1.x = (double)(pg[(vertexId + 1) % sz].X - pg[vertexId % sz].X);
+	vec1.y = (double)(pg[(vertexId + 1) % sz].Y - pg[vertexId % sz].Y);
+	vec2.x = (double)(pg[vertexId % sz].X - pg[(vertexId - 1) % sz].X);
+	vec2.y = (double)(pg[vertexId % sz].Y - pg[(vertexId - 1) % sz].Y);
+	normal = vec1 - vec2;
+	normal.normalize();
+	return normal;
+}
+
+// returns the unit normal at all vertices in a loop
+std::vector<Vector2<double>> Slice::getLoopNormals(int loopId)
+{
+	Vector2<double> vec1, vec2, normal;
+	std::vector<Vector2<double>> normal_vec;
+	Path pg = contour[loopId];
+	int sz = (int)pg.size();
+	vec2.x = (double)(pg[0].X - pg[sz - 1].X);
+	vec2.y = (double)(pg[0].Y - pg[sz - 1].Y);
+
+	for (size_t i = 0; i < sz - 1; i++)
+	{
+		vec1.x = (double)(pg[i + 1].X - pg[i].X);
+		vec1.y = (double)(pg[i + 1].Y - pg[i].Y);
+		normal = vec1 - vec2;
+		normal.normalize();
+		normal_vec.push_back(normal);
+		vec2 = vec1;
+	}
+	return normal_vec;
+}
+
+// returns the unit normal at all vertices in the slice
+std::vector<std::vector<Vector2<double>>> Slice::getAllNormals()
+{
+	std::vector<std::vector<Vector2<double>>> normals;
+	for (size_t i = 0; i < contour.size(); i++)
+		normals.push_back(getLoopNormals((int)i));
+	return normals;
+}
+
 // saves the contour in a file
 bool Slice::SaveToFile(const string& filename, unsigned decimal_places)
 {
@@ -222,6 +268,10 @@ int main()
 
 	rs.setContour(s.resampleContour(1000));
 	rs.SaveToFile("resampled_random_slice.txt", 3);
+
+	rs.getAllNormals();
+	rs.getLoopNormals(0);
+	rs.getNormalAt(1, 0);
 
 	SVGBuilder svg;
 	svg.style.penWidth = 0.8;

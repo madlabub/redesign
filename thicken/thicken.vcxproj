@@ -149,6 +149,7 @@
     <ClInclude Include="..\src\clipper.hpp" />
     <ClInclude Include="..\src\slice.hpp" />
     <ClInclude Include="..\src\SVGBuilder.hpp" />
+    <ClInclude Include="..\src\vmath.h" />
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="..\src\clipper.cpp" />

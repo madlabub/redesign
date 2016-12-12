@@ -4,6 +4,7 @@
 #include <iostream>
 #include "clipper.hpp"
 #include "SVGBuilder.hpp"
+#include "vmath.h"
 
 using namespace std;
 using namespace ClipperLib;
@@ -24,6 +25,9 @@ public:
 	Paths getContour();
 	std::vector<double> getContourLengths();
 	Paths resampleContour(int N);
+	Vector2<double> getNormalAt(int vertexId = 0, int loopId = 0);
+	std::vector<Vector2<double>> getLoopNormals(int loopId);
+	std::vector<std::vector<Vector2<double>>> getAllNormals();
 	bool LoadFromFile(const string& filename);
 	bool SaveToFile(const string& filename, unsigned decimal_places = 0);
 };
